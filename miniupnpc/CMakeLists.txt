@@ -50,7 +50,7 @@ if (NOT WIN32)
   add_definitions (-DMINIUPNPC_SET_SOCKET_TIMEOUT)
   add_definitions (-D_BSD_SOURCE -D_POSIX_C_SOURCE=200112L)
 else (NOT WIN32)
-  add_definitions (-D_WIN32_WINNT=0x0501 -DSTATICLIB -DMINIUPNP_STATICLIB) # XP or higher for getnameinfo and friends, static...
+  add_definitions (-D_WIN32_WINNT=0x0501) # XP or higher for getnameinfo and friends, static...
 endif (NOT WIN32)
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
@@ -127,6 +127,9 @@ endif (NOT UPNPC_BUILD_STATIC AND NOT UPNPC_BUILD_SHARED)
 if (UPNPC_BUILD_STATIC)
   add_library (upnpc-static STATIC ${MINIUPNPC_SOURCES})
   set_target_properties (upnpc-static PROPERTIES OUTPUT_NAME "miniupnpc")
+
+  target_compile_definitions(upnpc-static INTERFACE -DSTATICLIB -DMINIUPNP_STATICLIB) # XP or higher for getnameinfo and friends, static...
+
   target_link_libraries (upnpc-static ${LDLIBS})
   set (UPNPC_INSTALL_TARGETS ${UPNPC_INSTALL_TARGETS} upnpc-static)
   set (UPNPC_LIBRARY_TARGET upnpc-static)
