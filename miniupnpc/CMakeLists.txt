@@ -4,6 +4,24 @@ project (miniupnpc C)
 set (MINIUPNPC_VERSION 1.9)
 set (MINIUPNPC_API_VERSION 12)
 
+if (MSVC)
+set(CompilerFlags
+        CMAKE_CXX_FLAGS
+        CMAKE_CXX_FLAGS_DEBUG
+        CMAKE_CXX_FLAGS_RELEASE
+  CMAKE_CXX_FLAGS_MinSizeRel
+        CMAKE_C_FLAGS
+        CMAKE_C_FLAGS_DEBUG
+        CMAKE_C_FLAGS_RELEASE
+  CMAKE_C_FLAGS_MinSizeRel
+   )
+
+foreach(CompilerFlag ${CompilerFlags})
+  string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
+endforeach()
+
+endif()
+
 if (NOT CMAKE_BUILD_TYPE)
   if (WIN32)
     set (DEFAULT_BUILD_TYPE MinSizeRel)
@@ -32,7 +50,7 @@ if (NOT WIN32)
   add_definitions (-DMINIUPNPC_SET_SOCKET_TIMEOUT)
   add_definitions (-D_BSD_SOURCE -D_POSIX_C_SOURCE=200112L)
 else (NOT WIN32)
-  add_definitions (-D_WIN32_WINNT=0x0501) # XP or higher for getnameinfo and friends
+  add_definitions (-D_WIN32_WINNT=0x0501) # XP or higher for getnameinfo and friends, static...
 endif (NOT WIN32)
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
@@ -62,7 +80,7 @@ if (CMAKE_COMPILER_IS_GNUC)
   endif (NOT CONFIGURED)
 endif ()
 
-configure_file (${CMAKE_SOURCE_DIR}/miniupnpcstrings.h.cmake ${CMAKE_BINARY_DIR}/miniupnpcstrings.h)
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/miniupnpcstrings.h.cmake ${CMAKE_BINARY_DIR}/miniupnpcstrings.h)
 include_directories (${CMAKE_BINARY_DIR})
 
 set (MINIUPNPC_SOURCES
@@ -92,9 +110,9 @@ if (WIN32)
 endif (WIN32)
 
 if (WIN32)
-  find_library (WINSOCK2_LIBRARY NAMES ws2_32 WS2_32 Ws2_32)
-  find_library (IPHLPAPI_LIBRARY NAMES iphlpapi)
-  set (LDLIBS ${WINSOCK2_LIBRARY} ${IPHLPAPI_LIBRARY} ${LDLIBS})
+#  find_library (WINSOCK2_LIBRARY NAMES ws2_32 WS2_32 Ws2_32)
+#  find_library (IPHLPAPI_LIBRARY NAMES iphlpapi)
+  set (LDLIBS  Iphlpapi.lib ${LDLIBS})
 #elseif (CMAKE_SYSTEM_NAME STREQUAL "Solaris")
 #  find_library (SOCKET_LIBRARY NAMES socket)
 #  find_library (NSL_LIBRARY NAMES nsl)
@@ -109,6 +127,9 @@ endif (NOT UPNPC_BUILD_STATIC AND NOT UPNPC_BUILD_SHARED)
 if (UPNPC_BUILD_STATIC)
   add_library (upnpc-static STATIC ${MINIUPNPC_SOURCES})
   set_target_properties (upnpc-static PROPERTIES OUTPUT_NAME "miniupnpc")
+
+  target_compile_definitions(upnpc-static INTERFACE -DSTATICLIB -DMINIUPNP_STATICLIB) # XP or higher for getnameinfo and friends, static...
+
   target_link_libraries (upnpc-static ${LDLIBS})
   set (UPNPC_INSTALL_TARGETS ${UPNPC_INSTALL_TARGETS} upnpc-static)
   set (UPNPC_LIBRARY_TARGET upnpc-static)
