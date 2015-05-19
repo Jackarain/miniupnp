@@ -179,19 +179,22 @@ install (TARGETS ${UPNPC_INSTALL_TARGETS}
   LIBRARY DESTINATION lib${LIB_SUFFIX}
   ARCHIVE DESTINATION lib${LIB_SUFFIX}
 )
+
 install (FILES
 	miniupnpc.h
-  miniwget.h
-  upnpcommands.h
-  igd_desc_parse.h
-  upnpreplyparse.h
-  upnperrors.h
-  miniupnpctypes.h
-  portlistingparse.h
-  declspec.h
-  DESTINATION include/miniupnpc
+	miniwget.h
+	upnpcommands.h
+	igd_desc_parse.h
+	upnpreplyparse.h
+	upnperrors.h
+	miniupnpctypes.h
+	portlistingparse.h
+	declspec.h
+	DESTINATION include/miniupnpc
 )
 
 set (CONFIGURED YES CACHE INTERNAL "")
 
 # vim: ts=2:sw=2
+
+set_target_properties(upnpc-static PROPERTIES POSITION_INDEPENDENT_CODE ON)
